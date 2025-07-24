@@ -1,0 +1,52 @@
+job_sources:
+  seek:
+    base_url: "https://www.seek.com.au"
+    search_url: "https://www.seek.com.au/api/jobsearch/v5/search"
+    headers_api:
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+      "Referer": "https://www.seek.com.au/",
+      "x-seek-site": "Chalice",
+      "accept": "application/json, text/plain, */*",
+      "accept-language": "en-US,en;q=0.9",
+      "sec-fetch-site": "same-origin",
+      "sec-fetch-mode": "cors",
+      "sec-fetch-dest": "empty"
+    headers_scrape:
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/115.0.0.0 Safari/537.36",
+      "Referer": "https://www.seek.com.au/",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.5",
+      "Accept-Encoding": "gzip, deflate, br",
+      "Connection": "keep-alive",
+      "Upgrade-Insecure-Requests": "1"
+    default_params:
+      siteKey: "AU-Main"
+      sourcesystem: "houston"
+      locale: "en-AU"
+      source: "FE_SERP"
+      include: "seodata,gptTargeting,relatedsearches,asyncPills",
+      pageSize: 22
+      page: 1
+
+    job_detail_selectors:
+      title: "[data-automation='job-detail-title']"
+      company: "[data-automation='advertiser-name']"
+      location: "[data-automation='job-detail-location']"
+      description: "[data-automation='jobAdDetails']"
+      salary: "[data-automation='job-detail-salary']"
+      job_type: "[data-automation='job-detail-work-type']"
+      job_category: "[data-automation='job-detail-classifications']"
+      apply: "[data-automation='job-detail-apply']" # 'Quick Apply' 'Apply'
+      classifications: "[data-automation='job-detail-classifications']"
+      job_details_page: "[data-automation='job-details-page']"
+    
+
+  jora:
+    base_url: "https://au.jora.com"
+    job_detail_selectors:
+      title: "h1.job-title"
+      company: ".company-name"
+      location: ".location"
+      description: ".job-description"
+    headers:
+      User-Agent: "Mozilla/5.0"
