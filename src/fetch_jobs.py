@@ -31,12 +31,13 @@ with open("src/config.yaml", "r") as f:
 
 
 
-async def scrape_seek(custom_params:dict=None, limit:int=20) -> list:
+async def fetch_seek_jobs(custom_params:dict=None, job_ids:set=None, limit:int=20) -> list:
     """
     Scrape jobs from seek.com.au
     Args:
         custom_params: dict, custom parameters for the seek api. 
             If not provided, the default parameters will be used in config.yaml
+        job_ids: set, set of job ids to filter out.
         limit: int, limit the number of jobs to scrape.
     Returns:
         list, list of jobs
@@ -50,8 +51,8 @@ async def scrape_seek(custom_params:dict=None, limit:int=20) -> list:
     params = {
         "page": 1,
         "where": "Melbourne VIC 3000",
-        "keywords": "backend engineer", # space separated keywords
-        "daterange": "31", # how recent: 1 = 24h, 3 = 3 days, 7 = 7d, 14 = 14d, 31 = 31d
+        "keywords": "BUSINESS DEVELOPMENT MANAGER", # space separated keywords
+        "daterange": "7", # how recent: 1 = 24h, 3 = 3 days, 7 = 7d, 14 = 14d, 31 = 31d
         "worktype": "242", # 242 = full-time, 243 = part-time, 244 = casual, 245 = contract, 246 = internship
         "workarrangement": "1", # 1 = remote, 2 = hybrid, 3 = on-site
         "salarytype": "annual", # annual, hourly
@@ -75,9 +76,12 @@ async def scrape_seek(custom_params:dict=None, limit:int=20) -> list:
                     return
                 
                 for job in jobs:
+                    if job.get("id") in job_ids:
+                        logger.info(f"Skipping job: {job.get('id')} (duplicated)")
+                        continue
                     job_dict = {}
                     try:
-                        job_dict["id"] = job.get("id")
+                        job_dict["job_id"] = job.get("id")
                         job_dict["title"] = job.get("title")
                         job_dict["company"] = safe_get(job, ["advertiser", "description"])
                         job_dict["location"] = safe_get(job, ["locations", 0, "label"])
@@ -113,17 +117,8 @@ async def scrape_seek(custom_params:dict=None, limit:int=20) -> list:
                 logger.error(f"Raw response: {res.text[:300]}")
                 error_count += 1
                 continue
-
-        with open("src/sample_fetch_jobs.json", "w") as f:
-                json.dump(job_list, f, indent=4)
                 
         return job_list
                 
-            
-
     duration = time.time() - start_time
     logger.info(f"=== SEEK API Scraper Run Finished: {success_count} success, {error_count} errors, duration: {duration:.2f} seconds ===")
-
-if __name__ == "__main__":
-    asyncio.run(scrape_seek())
-

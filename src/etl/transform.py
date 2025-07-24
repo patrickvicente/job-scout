@@ -43,9 +43,6 @@ def transform_jobs(jobs_list: list) -> list:
 
             cleaned_jobs_list.append(job_dict)
 
-        with open("src/sample_transform_jobs.json", "w") as f:
-            json.dump(cleaned_jobs_list, f, indent=4)
-
     except Exception as e:
         logger.error("Failed to transform jobs", exc_info=True)
         return []

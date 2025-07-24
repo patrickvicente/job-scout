@@ -1,7 +1,9 @@
 import logging
 import asyncio
+from src.fetch_jobs import fetch_seek_jobs
+from src.etl.load import load_jobs_to_notion
 from src.etl.transform import transform_jobs
-from src.fetch_jobs import scrape_seek
+from src.notion.notion_integration import get_job_ids_from_notion
 
 logging.basicConfig(
     level=logging.INFO,
@@ -12,6 +14,22 @@ logging.basicConfig(
     ]
 )
 
+async def etl_pipeline():
+    """
+    ETL pipeline
+    """
+
+    # filter out jobs that already exist in notion
+    existing_job_ids = set(get_job_ids_from_notion(source="seek"))
+
+    # extract jobs
+    jobs = await fetch_seek_jobs(job_ids=existing_job_ids) # will pass args in the future from here
+
+    # transform jobs
+    clean_jobs = transform_jobs(jobs)
+
+    # load jobs to notion
+    load_jobs_to_notion(clean_jobs)
+
 if __name__ == "__main__":
-    sample_jobs = asyncio.run(scrape_seek())
-    transform_jobs(sample_jobs)
+    asyncio.run(etl_pipeline())

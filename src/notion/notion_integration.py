@@ -33,21 +33,19 @@ def push_job_to_notion(job: dict):
         bool, True if job was pushed to Notion, False otherwise
     """
     try:
-        
         properties = {
-            "Title": {"title": [{"text": {"content": str(job.get("title", ""))}}]},
-            "job_id": {"rich_text": [{"text": {"content": safe_str(job.get("job_id"))}}]},
+            "job_id": {"title": [{"text": {"content": job.get("job_id", "")}}]},
+            "Title": {"rich_text": [{"text": {"content": safe_str(job.get("title", ""))}}]},
             "Company": {"rich_text": [{"text": {"content": safe_str(job.get("company"))}}]},
             "Location": {"rich_text": [{"text": {"content": safe_str(job.get("location"))}}]},
             "Notes": {"rich_text": [{"text": {"content": safe_str(job.get("description"))}}]},
             "Category": {"rich_text": [{"text": {"content": safe_str(job.get("category"))}}]},
-            "Work Mode": {"select": {"name": safe_str(job.get("work_mode"))}},
+            "Work Mode": {"select": {"name": job.get("work_mode")}} if job.get("work_mode") else None,
             "Salary": {"rich_text": [{"text": {"content": safe_str(job.get("salary"))}}]},
             "Link": {"url": safe_str(job.get("url"))},
             "Tech Stack": {"multi_select": safe_multi_select(job.get("tech_stack"))},
             "Work Type": {"select": {"name": safe_str(job.get("work_type"))}},
             "Source": {"select": {"name": safe_str(job.get("source"))}},
-            "Experience Level": {"select": {"name": safe_str(job.get("experience_level"))}},
             "Method": {"select": {"name": "Job Scout"}},
         }
         
@@ -72,7 +70,7 @@ def push_job_to_notion(job: dict):
         logger.error("Failed to push job to Notion", exc_info=True)
         return False
 
-def get_job_ids_from_notion() -> list:
+def get_job_ids_from_notion(source: str="seek") -> list:
     """
     Get job ids from notion
     Returns:
@@ -84,30 +82,14 @@ def get_job_ids_from_notion() -> list:
             database_id=DATABASE_ID,
             filter={
                 "property": "Source",
-                "select": {"equals": "seek"}
+                "select": {"equals": source}
             }
         )
+        for result in response.get("results", []):
+            job_id = result["properties"].get("job_id", {}).get("title", [{}])[0].get("plain_text", "")
+            notion_job_ids.append(job_id)
+        return notion_job_ids
+        
     except Exception as e:
         logger.error("Failed to get jobs from notion", exc_info=True)
         return []
-
-test_job = {
-    "job_id": "12345672",
-    "title": "Senior Data Engineer",
-    "company": "Tech Innovators Inc.",
-    "location": "Sydney NSW",
-    "description": "Lead data engineering projects, mentor junior staff, and design scalable data pipelines.",
-    "category": "Engineering - Data",
-    "work_type": "Full time",
-    "work_mode": "Hybrid",
-    "salary": 150000,
-    "salary_currency": "AUD",
-    "source": "seek",
-    "url": "https://www.seek.com.au/job/12345678",
-    # "Notes" and "Method" are handled in the Notion integration, but you can add them if you want:
-    # "Notes": "This is a test job for Notion integration.",
-    # "Method": "Job Scout"
-}
-
-if __name__ == "__main__":
-    print(push_job_to_notion(test_job))

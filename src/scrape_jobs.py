@@ -49,3 +49,12 @@ if __name__ == "__main__":
         success_count += 1
     duration = time.time() - start_time
     logger.info(f"=== Job Scraper Run Finished: {success_count} success, {error_count} errors, duration: {duration:.2f} seconds ===")
+
+    properties = job_id {
+        'id': 'title', 
+        'type': 'title', 
+        'title': [
+            {'type': 'text', 
+            'text': {'content': 'Senior Data Engineer', 'link': None}, 
+            'annotations': {'bold': False, 'italic': False, 'strikethrough': False, 'underline': False, 'code': False, 'color': 'default'}, 
+            'plain_text': 'Senior Data Engineer', 'href': None}]}
