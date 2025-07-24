@@ -6,10 +6,10 @@ import time
 
 logger = logging.getLogger(__name__)
 
-with open("config.yaml") as f:
+with open("src/config.yaml") as f:
     config = yaml.safe_load(f)
 
-def get_seek_job_details_bs4(job_url: str) -> dict:
+def get_seek_job_details_bs4(job: dict) -> dict:
     headers = config["job_sources"]["seek"]["headers_scrape"]
     try:
         response = httpx.get(job_url, headers=headers, timeout=10.0, follow_redirects=True)

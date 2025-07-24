@@ -1,3 +1,10 @@
 # seek samples
 src/seek_sample.json
 src/seek_sample.txt
+
+# env
+.env
+
+/samples
+
+*.log

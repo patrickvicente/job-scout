@@ -1,6 +1,8 @@
 import logging
+import asyncio
+from src.etl.transform import transform_jobs
+from src.fetch_jobs import scrape_seek
 
-# Central logging configuration for the whole project
 logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s',
@@ -10,7 +12,6 @@ logging.basicConfig(
     ]
 )
 
-# You can import and run your ETL or scraping scripts here
-# Example:
-# from src import fetch_jobs, scraper
-# ...
+if __name__ == "__main__":
+    sample_jobs = asyncio.run(scrape_seek())
+    transform_jobs(sample_jobs)
